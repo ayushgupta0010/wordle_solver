@@ -1,0 +1,8 @@
+target/
+*.svg
+perf.data
+perf.data.old
+roget-*
+callgrind.out.*
+entropy.dat
+plot.png
