@@ -3,5 +3,9 @@ name = "wordle_solver"
 version = "0.1.0"
 edition = "2021"
 
+[profile.release]
+debug = true
+
 [dependencies]
+clap = { version = "4.5.23", features = ["derive"] }
 itertools = "0.13.0"
