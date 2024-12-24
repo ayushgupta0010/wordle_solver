@@ -103,76 +103,9 @@ pub struct Guess<'a> {
 
 impl Guess<'_> {
     pub fn matches(&self, word: &str) -> bool {
-        assert_eq!(self.word.len(), 5);
-        assert_eq!(word.len(), 5);
-
-        // check greens first
-        let mut used = [false; 5];
-        for (i, ((g, &m), w)) in self
-            .word
-            .bytes()
-            .zip(&self.mask)
-            .zip(word.bytes())
-            .enumerate()
-        {
-            if m == Correctness::Correct {
-                if g != w {
-                    return false;
-                } else {
-                    used[i] = true;
-                }
-            }
-        }
-
-        for (i, (w, &m)) in word.bytes().zip(&self.mask).enumerate() {
-            if m == Correctness::Correct {
-                continue;
-            }
-
-            let mut plausible = true;
-            if self
-                .word
-                .bytes()
-                .zip(&self.mask)
-                .enumerate()
-                .any(|(j, (g, m))| {
-                    if g != w {
-                        return false;
-                    }
-                    if used[j] {
-                        return false;
-                    }
-
-                    match m {
-                        Correctness::Correct => unreachable!(
-                            "all correct guesses should have result in return or be used"
-                        ),
-                        Correctness::Misplaced if j == i => {
-                            plausible = false;
-                            return false;
-                        }
-                        Correctness::Misplaced => {
-                            used[j] = true;
-                            return true;
-                        }
-                        Correctness::Wrong => {
-                            plausible = false;
-                            return false;
-                        }
-                    }
-                })
-                && plausible
-            {
-                // word might still match
-                assert!(plausible);
-            } else if !plausible {
-                return false;
-            } else {
-                // no info about the character, and the word might stil match
-            }
-        }
-
-        true
+        // if the guess gives mask M against the answer, then
+        // the answer should also give the same mask against the guess
+        Correctness::compute(word, &self.word) == self.mask
     }
 }
 
